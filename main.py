@@ -68,8 +68,3 @@ def main():
                 bot.send_message(CHAT_ID, alert)
                 sent_matches.add(match_id)
                 print(f"ALERTE 1XBET: {match['homeTeam']['name']} vs {match['awayTeam']['name']}")
-        
-        time.sleep(60)
-
-if __name__ == "__main__":
-    main()
