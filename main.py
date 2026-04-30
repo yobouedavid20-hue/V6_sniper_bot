@@ -1,11 +1,11 @@
 import os
 import time
 import telebot
-TOKEN = os.getenv"8699033001:AAGhYlPsrp..."
-CHAT_ID = os.getenv"1234567890"
+from datetime import datetime
+import requests
 
-TOKEN = os.getenv"8699033001:AAGhYLpSrpm79HebzovzqFwZSvCrNK-3T3c"
-CHAT_ID = os.getenv"7661174841"
+TOKEN = os.getenv("TOKEN")
+CHAT_ID = os.getenv("CHAT_ID")
 bot = telebot.TeleBot(TOKEN)
 
 def get_live_matches():
@@ -19,52 +19,41 @@ def get_live_matches():
 
 def check_v6_live_but(event):
     try:
-        status = event['status']
-        if status['type'] != 'inprogress':
+        if event['status']['type'] != 'inprogress':
             return None
             
-        minute_str = status.get('description', '0').replace("'", "")
-        if not minute_str.isdigit():
-            return None
-            
-        minute = int(minute_str)
+        minute = int(event['status'].get('description', '0').replace("'", ""))
         home_score = event['homeScore']['current']
         away_score = event['awayScore']['current']
         
-        # V6 LIVE: 0-0 après 78min = BUT SUPPLÉMENTAIRE
         if home_score == 0 and away_score == 0 and minute >= 78:
-            home_team = event['homeTeam']['name']
-            away_team = event['awayTeam']['name']
-            tournament = event['tournament']['name']
+            home = event['homeTeam']['name']
+            away = event['awayTeam']['name']
+            league = event['tournament']['name']
             
-            message = f"⚽ V6 LIVE {minute}'\n\n" \
-                     f"🏆 {tournament}\n" \
-                     f"🔥 {home_team} 0-0 {away_team}\n\n" \
-                     f"SNIPER 1XBET :\n" \
-                     f"→ +0.5 BUT FT\n" \
-                     f"→ Prochain But\n\n" \
-                     f"GO SUR 1XBET CI DIRECT !"
-            return message
-            
-    except Exception as e:
-        print(f"Erreur event: {e}")
+            msg = f"⚽ V6 LIVE {minute}'\n\n🏆 {league}\n🔥 {home} 0-0 {away}\n\nSNIPER 1XBET :\n→ +0.5 BUT FT\n→ Prochain But\n\nGO SUR 1XBET CI DIRECT !"
+            return msg
+    except:
         return None
 
 def main():
-    bot.send_message(CHAT_ID, "✅ Bot V6 LIVE 1XBET démarré. Scan 0-0 après 78e pour Over 0.5.")
+    bot.send_message(CHAT_ID, "✅ Bot V6 LIVE 1XBET démarré. Scan 0-0 après 78e.")
     sent_matches = set()
     
     while True:
-        print(f"Scan live {datetime.now().strftime('%H:%M:%S')}")
+        print(f"Scan {datetime.now().strftime('%H:%M:%S')}")
         matches = get_live_matches()
         
         for match in matches:
-            match_id = match['id']
-            if match_id in sent_matches:
+            if match['id'] in sent_matches:
                 continue
                 
             alert = check_v6_live_but(match)
             if alert:
                 bot.send_message(CHAT_ID, alert)
-                sent_matches.add(match_id)
-                print(f"ALERTE 1XBET: {match['homeTeam']['name']} vs {match['awayTeam']['name']}")
+                sent_matches.add(match['id'])
+        
+        time.sleep(60)
+
+if __name__ == "__main__":
+    main()
