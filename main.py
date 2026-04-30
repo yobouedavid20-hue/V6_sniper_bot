@@ -1,8 +1,8 @@
 import os
 import time
 import telebot
-from datetime import datetime
-import requests
+TOKEN = os.getenv"8699033001:AAGhYlPsrp..."
+CHAT_ID = os.getenv"1234567890"
 
 TOKEN = os.getenv"8699033001:AAGhYLpSrpm79HebzovzqFwZSvCrNK-3T3c"
 CHAT_ID = os.getenv"7661174841"
