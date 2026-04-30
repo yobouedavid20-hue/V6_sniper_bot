@@ -4,8 +4,8 @@ import telebot
 from datetime import datetime
 import requests
 
-TOKEN = os.getenv 8699033001:AAGhYLpSrpm79HebzovzqFwZSvCrNK-3T3c
-CHAT_ID = os.getenv 7661174841
+TOKEN = 8699033001:AAGhYLpSrpm79HebzovzqFwZSvCrNK-3T3c
+CHAT_ID = 7661174841
 bot = telebot.TeleBot(TOKEN)
 
 def get_live_matches():
