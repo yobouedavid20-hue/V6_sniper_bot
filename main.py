@@ -1,50 +1,53 @@
-import datetime
+import os
+import time
+import telebot
+from datetime import datetime
 import requests
 
 TOKEN = os.getenv"8699033001:AAGhYLpSrpm79HebzovzqFwZSvCrNK-3T3c"
 CHAT_ID = os.getenv"7661174841"
-bot = telebot.TeleBotTOKEN
+bot = telebot.TeleBot(TOKEN)
 
-def get_live_matches:
+def get_live_matches():
     url = "https://api.sofascore.com/api/v1/sport/football/events/live"
-    headers = "User-Agent": "Mozilla/5.0"
+    headers = {"User-Agent": "Mozilla/5.0"}
     try:
-        response = requests.geturl, headers=headers, timeout=10
-        return response.json.get'events'
+        response = requests.get(url, headers=headers, timeout=10)
+        return response.json().get('events', [])
     except:
-        return 
+        return []
 
-def check_v6_live_butevent:
+def check_v6_live_but(event):
     try:
-        status = event'status'
-        if status'type' = 'inprogress':
+        status = event['status']
+        if status['type'] != 'inprogress':
             return None
             
-        minute_str = status.get'description' '0'.replace"'" ""
-        if not minute_str.isdigit:
+        minute_str = status.get('description', '0').replace("'", "")
+        if not minute_str.isdigit():
             return None
             
-        minute = intminute_str
-        home_score = event'homeScore''current'
-        away_score = event'awayScore''current'
+        minute = int(minute_str)
+        home_score = event['homeScore']['current']
+        away_score = event['awayScore']['current']
         
         # V6 LIVE: 0-0 après 78min = BUT SUPPLÉMENTAIRE
-        if home_score == 0 and away_score == 0 and minute = 78:
-            home_team = event'homeTeam''name'
-            away_team = event'awayTeam''name'
-            tournament = event'tournament''name'
+        if home_score == 0 and away_score == 0 and minute >= 78:
+            home_team = event['homeTeam']['name']
+            away_team = event['awayTeam']['name']
+            tournament = event['tournament']['name']
             
-            message = f"⚽ V6 LIVE minute'\n\n" 
-                     f"🏆 tournament\n" 
-                     f"🔥 home_team 0-0 away_team\n\n" 
-                     f"SNIPER 1XBET :\n" 
-                     f"→ +0.5 BUT FT\n" 
-                     f"→ Prochain But\n\n" 
+            message = f"⚽ V6 LIVE {minute}'\n\n" \
+                     f"🏆 {tournament}\n" \
+                     f"🔥 {home_team} 0-0 {away_team}\n\n" \
+                     f"SNIPER 1XBET :\n" \
+                     f"→ +0.5 BUT FT\n" \
+                     f"→ Prochain But\n\n" \
                      f"GO SUR 1XBET CI DIRECT !"
             return message
             
     except Exception as e:
-        print(f"Erreur event: e"
+        print(f"Erreur event: {e}")
         return None
 
 def main():
